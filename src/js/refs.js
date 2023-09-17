@@ -1,4 +1,4 @@
-export const object = {
+export const refs = {
     form: document.querySelector('.search-form'),
     list: document.querySelector('.gallery'),
     searchBtn: document.querySelector('.load-more'),

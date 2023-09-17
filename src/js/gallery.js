@@ -4,16 +4,18 @@ import { lightbox } from './SimpleLightbox.js';
 import { renderList } from './renderList.js'
 import { Notify } from 'notiflix';
 
-const pixabayApi = new pixabayApi(40);
+const pixabayApi = new PixabayAPI(40);
+
+let totalPages = 0;
 
 refs.form.addEventListener('submit', onSubmit);
 
 async function onSubmit(e) {
     e.preventDefault();
 
-    const searchEl = e.currentTarget.elements.searchEl.value.trim();
+    const searchEl = e.currentTarget.elements['searchEl']
     if(!searchEl) {
-        return Notify.warning("Please, fill the main field")
+        return Notify.failure("Sorry, there are no images matching your search query. Please try again.")
     }
 
     pixabayApi.q = searchEl;
@@ -22,7 +24,7 @@ async function onSubmit(e) {
     try {
         const { totalHits, hits } = await pixabayApi.getPhotos();
         if (totalHits === 0) {
-            Notify.failure ('Sorry, there are no images matching your search query. Please try again.')
+           return Notify.failure ('Sorry, there are no images matching your search query. Please try again.')
         } 
         else {
             Notify.success("Hooray! We found: ${totalHits} images.");
@@ -30,10 +32,36 @@ async function onSubmit(e) {
             refs.list.innerHTML = renderList(hits);
             lightbox.refresh()
         }
-        
-        totalPages = 
+        if( totalPages === 1 ) {
+            return
+        }
+        observer.observe(refs.targetEl)
+    } catch(error) {
+            getError()
+        }
+        finally {
+            refs.form.reset()
+        }
+
+        totalPages = Math.ceil(totalHits / 40);
+
+       
+     
+      } 
+    
+    
+    const observer = new IntersectionObserver((entries, observer) => {
+        if(entries[0].isInteresting) {
+            loadMore()
+        }
+    },
+    {
+    root: null, 
+    rooyMargin:'300px', 
+    treshold: 0,
     }
-}
+    )   
+ 
 
 
 async function loadMore(e) {
@@ -42,10 +70,8 @@ async function loadMore(e) {
 
     try {
         if(pixabayApi.page === totalPages) {
-            Notify.info("You've reached the end of search results")
-
-            return;
-        }
+            return Notify.info("We're sorry, but you've reached the end of search results.")
+    }
         refs.list.insertAdjacentHTML('beforeend', renderList(hits));
         lightbox.refresh();
     }
@@ -54,6 +80,3 @@ async function loadMore(e) {
     }
 }
 
-function getError() {
-    Notify.failure("Oops! Something went wrong! Try reloading the page!")
-}

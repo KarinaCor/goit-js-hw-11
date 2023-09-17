@@ -12,8 +12,8 @@ refs.form.addEventListener('submit', onSubmit);
 
 async function onSubmit(e) {
     e.preventDefault();
-
-    const searchEl = e.currentTarget.elements['searchEl']
+console.log(e.currentTarget.elements);
+    const searchEl = e.currentTarget.elements['searchQuery'].value.trim()
     if(!searchEl) {
         return Notify.failure("Sorry, there are no images matching your search query. Please try again.")
     }
@@ -23,11 +23,12 @@ async function onSubmit(e) {
 
     try {
         const { totalHits, hits } = await pixabayApi.getPhotos();
+        totalPages = Math.ceil(totalHits / 40);
         if (totalHits === 0) {
            return Notify.failure ('Sorry, there are no images matching your search query. Please try again.')
         } 
         else {
-            Notify.success("Hooray! We found: ${totalHits} images.");
+            Notify.success(`Hooray! We found: ${totalHits} images.`);
 
             refs.list.innerHTML = renderList(hits);
             lightbox.refresh()
@@ -37,13 +38,13 @@ async function onSubmit(e) {
         }
         observer.observe(refs.targetEl)
     } catch(error) {
-            getError()
+        Notify.failure(`${error}`)
         }
         finally {
             refs.form.reset()
         }
 
-        totalPages = Math.ceil(totalHits / 40);
+        
 
        
      
@@ -76,7 +77,7 @@ async function loadMore(e) {
         lightbox.refresh();
     }
     catch(error) {
-        getError()
+        Notify.failure(`${error}`)
     }
 }
 

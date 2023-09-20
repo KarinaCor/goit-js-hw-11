@@ -10,7 +10,7 @@ export function renderList(card) {
             downloads,
         }) => {
             return `<a class="gallery__link" href="${largeImageURL}">
-             '<div class="photo-card">
+             <div class="photo-card">
             <img class="gallery-img "src="${webformatURL}" alt="${tags}" loading="lazy" />
             <div class="info">
               <p class="info-item">
@@ -30,7 +30,7 @@ export function renderList(card) {
                 ${downloads}
               </p>
             </div>
-          </div>'
+          </div>
           </a>`;
         }
 

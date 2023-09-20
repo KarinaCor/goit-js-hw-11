@@ -16,7 +16,9 @@ console.log(e.currentTarget.elements);
     const searchEl = e.currentTarget.elements['searchQuery'].value.trim()
     if(!searchEl) {
         return Notify.failure("Sorry, there are no images matching your search query. Please try again.")
+       
     }
+    
 
     pixabayApi.q = searchEl;
     pixabayApi.page = 1;
@@ -31,50 +33,50 @@ console.log(e.currentTarget.elements);
             Notify.success(`Hooray! We found: ${totalHits} images.`);
 
             refs.list.innerHTML = renderList(hits);
-            lightbox.refresh()
+            lightbox.refresh();
         }
         if( totalPages === 1 ) {
-            return
+            return;
         }
         observer.observe(refs.targetEl)
     } catch(error) {
         Notify.failure(`${error}`)
         }
         finally {
-            refs.form.reset()
+            refs.form.reset();
         }
-
-        
-
-       
-     
-      } 
+             
+           } 
     
     
     const observer = new IntersectionObserver((entries, observer) => {
         if(entries[0].isInteresting) {
-            loadMore()
+            loadMoreData()
         }
     },
     {
     root: null, 
-    rooyMargin:'300px', 
-    treshold: 0,
+    rootMargin:'300px', 
+    treshold: 1,
     }
-    )   
+    );
  
 
 
-async function loadMore(e) {
+async function loadMoreData() {
     pixabayApi.page +=1;
     const { hits } = await pixabayApi.getPhotos();
 
     try {
-        if(pixabayApi.page === totalPages) {
-            return Notify.info("We're sorry, but you've reached the end of search results.")
-    }
         refs.list.insertAdjacentHTML('beforeend', renderList(hits));
+        
         lightbox.refresh();
+        if(pixabayApi.page === totalPages) {
+           Notify.info("We're sorry, but you've reached the end of search results.")
+    observer.unobserve(refs.targetEl)
+    return;
+        }
+       
     }
     catch(error) {
         Notify.failure(`${error}`)

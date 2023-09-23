@@ -50,14 +50,14 @@ console.log(e.currentTarget.elements);
     
     
     const observer = new IntersectionObserver((entries, observer) => {
-        if(entries[0].isInteresting) {
+        if(entries[0].isIntersecting) {
             loadMoreData()
         }
     },
     {
     root: null, 
     rootMargin:'300px', 
-    treshold: 1,
+    threshold: 1,
     }
     );
  
